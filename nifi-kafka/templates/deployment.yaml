@@ -20,6 +20,8 @@ spec:
     spec:
       containers:
         {{- include "Zookeeper.container" . | nindent 8 }}
+      imagePullSecrets:
+        - name: regcred
 
 ---
 
@@ -45,6 +47,8 @@ spec:
     spec:
       containers:
         {{- include "Kafka.container" . | nindent 8 }}
+      imagePullSecrets:
+        - name: regcred
 
 ---
 
@@ -69,6 +73,8 @@ spec:
     spec:
       containers:
         {{- include "Nifi.container" . | nindent 8 }}
+      imagePullSecrets:
+        - name: regcred
 
 ---
 
@@ -99,6 +105,8 @@ spec:
           name: nifi
           ports:
             - containerPort: 8090
+      imagePullSecrets:
+        - name: regcred
 
 
 ---
@@ -129,5 +137,7 @@ spec:
           name: kafdrop
           ports:
             - containerPort: 9000
+      imagePullSecrets:
+        - name: regcred
 
 
