@@ -1,0 +1,94 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: zookeeper-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: zookeeper
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: kafka
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kafka-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: kafka
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: kafdrop
+    - podSelector:
+        matchLabels:
+          app: nifi
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kafdrop-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: kafdrop
+  policyTypes:
+  - Ingress
+  ingress:
+  - {}
+
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nifi-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: nifi
+  policyTypes:
+  - Ingress
+  ingress:
+  - {}
+
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nifi-v2-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: nifi-version-2
+  policyTypes:
+  - Ingress
+  ingress: 
+  - {}

@@ -1,0 +1,38 @@
+service:
+  name:
+    zookeeper: zookeeper-service
+    kafka: kafka-service
+    nifi: nifi-service
+  labels:
+    zookeeper: zookeeper-service
+    kafka: kafka-service
+    nifi: nifi-service
+  type: NodePort
+  ports:
+    zookeeper:
+      port: 2181
+      nodePort: 30181
+    kafka:
+      portBroker: 9092
+      nameBroker: kafka-broker
+      portHost: 9094
+      nameHost: kafka-host
+      portCtrl: 9094
+      nameCtrl: kafka-ctrl
+    nifi:
+      port: 8080
+
+deployments:
+  nifi:
+    name: dep-nifi
+
+  kafka:
+    name: dep-kafka
+
+  zookeeper:
+    name: dep-zookeeper
+
+replicaCount: 1
+
+ingress:
+  ingressClassName: nginx

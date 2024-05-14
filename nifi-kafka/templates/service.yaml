@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+  name: {{ .Values.service.name.zookeeper }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+      - port: {{ .Values.service.ports.zookeeper.port }}
+        protocol: "TCP"
+        targetPort: {{ .Values.service.ports.zookeeper.port }}
+  selector:
+    {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
+      app: zookeeper
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+  name: {{ .Values.service.name.kafka }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+      - port: {{ .Values.service.ports.kafka.portBroker }}
+        protocol: "TCP"
+        targetPort: {{ .Values.service.ports.kafka.portBroker }}
+  selector:
+    {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
+      app: kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+  name: {{ .Values.service.name.nifi }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.ports.nifi.port }}
+      protocol: "TCP"
+  selector:
+    {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
+      app: nifi
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nifi-version-2
+    name: test
+  name: nifi-v2-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8090
+      protocol: "TCP"
+  selector:
+    app: nifi-version-2
+    name: test
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kafdrop
+  name: kafdrop-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+  selector:
+    app: kafdrop

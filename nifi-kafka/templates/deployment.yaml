@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.deployments.zookeeper.name }}
+  labels:
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+    app: zookeeper
+spec:
+  serviceName: {{ .Values.service.name.zookeeper }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        {{- include "Nifi_Kafka.labels" . | nindent 8 }}
+        app: zookeeper
+    spec:
+      containers:
+        {{- include "Zookeeper.container" . | nindent 8 }}
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.deployments.kafka.name }}
+  labels:
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+    app: kafka
+spec:
+  serviceName: {{ .Values.service.name.kafka }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
+      app: kafka
+  template:
+    metadata:
+      labels:
+        {{- include "Nifi_Kafka.labels" . | nindent 8 }}
+        app: kafka
+    spec:
+      containers:
+        {{- include "Kafka.container" . | nindent 8 }}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployments.nifi.name }}
+  labels:
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+    app: nifi
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
+      app: nifi
+  template:
+    metadata:
+      labels:
+        {{- include "Nifi_Kafka.labels" . | nindent 8 }}
+        app: nifi
+    spec:
+      containers:
+        {{- include "Nifi.container" . | nindent 8 }}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nifi-v2
+  labels:
+    app: nifi-version-2
+    name: test
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: nifi-version-2
+      name: test
+  template:
+    metadata:
+      labels:
+        app: nifi-version-2
+        name: test
+    spec:
+      containers:
+        - env:
+          - name: NIFI_WEB_HTTP_PORT
+            value: "8090"
+          image: harbor.sharing.ncc.local/ncfc/nifi:latest
+          name: nifi
+          ports:
+            - containerPort: 8090
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kafdrop
+  name: kafdrop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafdrop
+  template:
+    metadata:
+      labels:
+        app: kafdrop
+    spec:
+      hostname: kafdrop
+      containers:
+        - env:
+          - name: KAFKA_BROKERCONNECT
+            value: {{ .Values.service.name.kafka }}:{{ .Values.service.ports.kafka.portBroker }}
+          - name: JVM_OPTS
+            value: "-Xms32M -Xmx64M"
+          image: harbor.sharing.ncc.local/ncfc/kafdrop:latest
+          name: kafdrop
+          ports:
+            - containerPort: 9000
+
+

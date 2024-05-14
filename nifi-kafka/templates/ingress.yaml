@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nifi-kafka-test-helm
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: nifi.sharing.ncc.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.name.nifi }}
+                port:
+                  number: 8080
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nifi-v2-kafka-test-helm
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: nifi.v2.sharing.ncc.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nifi-v2-service
+                port:
+                  number: 8090
+
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kafdrop-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: kafdrop.sharing.ncc.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kafdrop-service
+                port:
+                  number: 9000

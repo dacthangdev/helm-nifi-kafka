@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "Nifi_Kafka.fullname" . }}-test-connection"
+  labels:
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "Nifi_Kafka.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
