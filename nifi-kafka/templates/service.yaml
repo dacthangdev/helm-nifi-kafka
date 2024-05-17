@@ -12,8 +12,8 @@ spec:
         targetPort: {{ .Values.service.ports.zookeeper.port }}
   selector:
     {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
-      app: {{ .Values.service.name.zookeeper }}
-      
+      app: {{ .Values.deployments.zookeeper.name }}
+
 ---
 
 apiVersion: v1
@@ -30,7 +30,7 @@ spec:
         targetPort: {{ .Values.service.ports.kafka.portBroker }}
   selector:
     {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
-      app: {{ .Values.service.name.kafka }}
+      app: {{ .Values.deployments.kafka.name }}
 ---
 apiVersion: v1
 kind: Service
@@ -45,7 +45,7 @@ spec:
       protocol: "TCP"
   selector:
     {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
-      app: {{ .Values.service.name.nifi }}
+      app: {{ .Values.deployments.nifi.name }}
 
 
 ---
