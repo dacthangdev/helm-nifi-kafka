@@ -4,24 +4,31 @@ metadata:
   name: {{ .Values.deployments.zookeeper.name }}
   labels:
     {{- include "Nifi_Kafka.labels" . | nindent 4 }}
-    app: zookeeper
+    app: {{ .Values.deployments.zookeeper.name }}
 spec:
   serviceName: {{ .Values.service.name.zookeeper }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
-      app: zookeeper
+      app: {{ .Values.deployments.zookeeper.name }}
   template:
     metadata:
       labels:
         {{- include "Nifi_Kafka.labels" . | nindent 8 }}
-        app: zookeeper
+        app: {{ .Values.deployments.zookeeper.name }}
     spec:
       containers:
-        {{- include "Zookeeper.container" . | nindent 8 }}
+        {{- include "Zookeeper.enviroments" . | nindent 8 }}
+          image: {{ .Values.image.registry }}/{{ .Values.deployments.zookeeper.image }}:{{ .Values.deployments.zookeeper.tag}}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: zookeeper
+          ports:
+            - containerPort: {{ .Values.deployments.zookeeper.containerPort}}
+      {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+{{ toYaml .Values.image.imagePullSecrets | indent 8 }}
+      {{- end }}
 
 ---
 
@@ -31,24 +38,32 @@ metadata:
   name: {{ .Values.deployments.kafka.name }}
   labels:
     {{- include "Nifi_Kafka.labels" . | nindent 4 }}
-    app: kafka
+    app: {{ .Values.deployments.kafka.name }}
 spec:
   serviceName: {{ .Values.service.name.kafka }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
-      app: kafka
+      app: {{ .Values.deployments.kafka.name }}
   template:
     metadata:
       labels:
         {{- include "Nifi_Kafka.labels" . | nindent 8 }}
-        app: kafka
+        app: {{ .Values.deployments.kafka.name }}
     spec:
       containers:
-        {{- include "Kafka.container" . | nindent 8 }}
+        {{- include "Kafka.enviroments" . | nindent 8 }}
+          image: {{ .Values.image.registry }}/{{ .Values.deployments.kafka.image }}:{{ .Values.deployments.kafka.tag}}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: kafka-broker
+          ports:
+            - containerPort: {{ .Values.deployments.kafka.containerPort}}
+      {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+{{ toYaml .Values.image.imagePullSecrets | indent 8 }}
+      {{- end }}
+
 
 ---
 
@@ -58,23 +73,30 @@ metadata:
   name: {{ .Values.deployments.nifi.name }}
   labels:
     {{- include "Nifi_Kafka.labels" . | nindent 4 }}
-    app: nifi
+    app: {{ .Values.deployments.nifi.name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "Nifi_Kafka.selectorLabels" . | nindent 6 }}
-      app: nifi
+      app: {{ .Values.deployments.nifi.name }}
   template:
     metadata:
       labels:
         {{- include "Nifi_Kafka.labels" . | nindent 8 }}
-        app: nifi
+        app: {{ .Values.deployments.nifi.name }}
     spec:
       containers:
-        {{- include "Nifi.container" . | nindent 8 }}
+        - image: {{ .Values.image.registry }}/{{ .Values.deployments.nifi.image }}:{{ .Values.deployments.nifi.tag}}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: nifi
+          ports:
+            - containerPort: {{ .Values.deployments.nifi.containerPort}}
+          {{- include "Nifi.enviroments" . | nindent 10 }}
+      {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+{{ toYaml .Values.image.imagePullSecrets | indent 8 }}
+      {{- end }}
 
 ---
 
@@ -105,8 +127,10 @@ spec:
           name: nifi
           ports:
             - containerPort: 8090
+      {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+{{ toYaml .Values.image.imagePullSecrets | indent 8 }}
+      {{- end }}
 
 
 ---
@@ -114,30 +138,31 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: kafdrop
-  name: kafdrop
+    {{- include "Nifi_Kafka.labels" . | nindent 4 }}
+    app:  {{ .Values.deployments.kafdrop.name }}
+  name: {{ .Values.deployments.kafdrop.name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafdrop
+      {{- include "Nifi_Kafka.labels" . | nindent 6 }}
+      app:  {{ .Values.deployments.kafdrop.name }}
   template:
     metadata:
       labels:
-        app: kafdrop
+        {{- include "Nifi_Kafka.labels" . | nindent 8 }}
+        app:  {{ .Values.deployments.kafdrop.name }}
     spec:
-      hostname: kafdrop
       containers:
-        - env:
-          - name: KAFKA_BROKERCONNECT
-            value: {{ .Values.service.name.kafka }}:{{ .Values.service.ports.kafka.portBroker }}
-          - name: JVM_OPTS
-            value: "-Xms32M -Xmx64M"
-          image: harbor.sharing.ncc.local/ncfc/kafdrop:latest
+        {{- include "Kafdrop.enviroments" . | nindent 8 }}
+          image: {{ .Values.image.registry }}/{{ .Values.deployments.kafdrop.image }}:{{ .Values.deployments.kafdrop.tag}}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: kafdrop
           ports:
-            - containerPort: 9000
+            - containerPort: {{ .Values.deployments.kafdrop.containerPort}}
+      {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+{{ toYaml .Values.image.imagePullSecrets | indent 8 }}
+      {{- end }}
 
 

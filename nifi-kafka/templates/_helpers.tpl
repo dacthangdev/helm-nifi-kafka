@@ -63,10 +63,10 @@ Create the name of the service account to use
 
 
 {{/*
-Create containers Kafka
+Create enviroments Kafka
 */}}
 
-{{- define "Kafka.container" -}}
+{{- define "Kafka.enviroments" -}}
 - env:
     - name: KAFKA_BROKER_ID
       value: "8"
@@ -82,43 +82,44 @@ Create containers Kafka
       value: "5555"
     - name: KAFKA_CLEANUP_POLICY
       value: "compact"
-  image: harbor.sharing.ncc.local/ncfc/kafka:latest
-  name: kafka-broker
-  ports:
-    - containerPort: 9092
 {{- end -}}
 
 
 {{/*
-Create containers Zookeeper
+Create enviroments Zookeeper
 */}}
 
-{{- define "Zookeeper.container" -}}
-- image: harbor.sharing.ncc.local/ncfc/zookeeper:latest
-  name: zookeeper
-  env:
-    - name: ALLOW_ANONYMOUS_LOGIN
-      value: "yes"
-    - name: ZOO_SERVER_ID
-      value: "1"
-    - name: ZOOKEEPER_SERVER_1
-      value: "zookeeper1"
-  ports:
-    - containerPort: 2121
-{{- end -}}
-
-{{/*
-Create containers Nifi
-*/}}
-
-{{- define "Nifi.container" -}}
+{{- define "Zookeeper.enviroments" -}}
 - env:
-    - name: NIFI_WEB_HTTP_PORT
-      value: "8080"
-  image: harbor.sharing.ncc.local/ncfc/nifi:latest
-  name: nifi
-  ports:
-    - containerPort: 8080
+  - name: ALLOW_ANONYMOUS_LOGIN
+    value: "yes"
+  - name: ZOO_SERVER_ID
+    value: "1"
+  - name: ZOOKEEPER_SERVER_1
+    value: "zookeeper1"
+{{- end -}}
+
+{{/*
+Create enviroments Nifi
+*/}}
+
+{{- define "Nifi.enviroments" -}}
+env:
+  - name: NIFI_WEB_HTTP_PORT
+    value: "8080"
+{{- end -}}
+
+
+{{/*
+Create enviroments Kafdrop
+*/}}
+
+{{- define "Kafdrop.enviroments" -}}
+- env:
+  - name: KAFKA_BROKERCONNECT
+    value: {{ .Values.service.name.kafka }}:{{ .Values.service.ports.kafka.portBroker }}
+  - name: JVM_OPTS
+    value: "-Xms32M -Xmx64M"
 {{- end -}}
 
 

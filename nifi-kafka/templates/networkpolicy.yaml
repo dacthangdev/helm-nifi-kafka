@@ -16,14 +16,14 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: zookeeper
+      app: {{ .Values.deployments.zookeeper.name }}
   policyTypes:
   - Ingress
   ingress:
   - from:
     - podSelector:
         matchLabels:
-          app: kafka
+          app: {{ .Values.deployments.kafka.name }}
 
 ---
 
@@ -34,17 +34,17 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: kafka
+      app: {{ .Values.deployments.kafka.name }}
   policyTypes:
   - Ingress
   ingress:
   - from:
     - podSelector:
         matchLabels:
-          app: kafdrop
+          app: {{ .Values.deployments.kafdrop.name }}
     - podSelector:
         matchLabels:
-          app: nifi
+          app: {{ .Values.deployments.nifi.name }}
 
 ---
 
@@ -55,7 +55,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: kafdrop
+      app: {{ .Values.deployments.kafdrop.name }}
   policyTypes:
   - Ingress
   ingress:
@@ -71,7 +71,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: nifi
+      app: {{ .Values.deployments.nifi.name }}
   policyTypes:
   - Ingress
   ingress:
