@@ -58,6 +58,7 @@ image:
     - name: "regcred"
   pullPolicy: IfNotPresent
 ingress:
+  secret: ingress-cert
   ingressClassName: nginx
   nifi:
     name: nifi-kafka-test-helm

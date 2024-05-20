@@ -4,6 +4,10 @@ metadata:
   name: {{ .Values.ingress.nifi.name }}
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.nifi.host }}
+    secretName: {{ .Values.ingress.secret }}
   rules:
     - host: {{ .Values.ingress.nifi.host }}
       http:
@@ -23,7 +27,11 @@ kind: Ingress
 metadata:
   name: nifi-v2-kafka-test-helm
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  tls:
+  - hosts:
+    - nifi.v2.sharing.ncc.local
+    secretName: {{ .Values.ingress.secret }}
   rules:
     - host: nifi.v2.sharing.ncc.local
       http:
@@ -43,7 +51,11 @@ kind: Ingress
 metadata:
   name: {{ .Values.ingress.kafdrop.name }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.kafdrop.host }}
+    secretName: {{ .Values.ingress.secret }}
   rules:
     - host: {{ .Values.ingress.kafdrop.host }}
       http:
